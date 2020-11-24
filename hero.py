@@ -1,11 +1,14 @@
 import random
 from ability import Ability
 from armor import Armor
+from weapon import Weapon
+from team import Team
 
 class Hero:
     def __init__(self, name, starting_health=100):
         self.abilities = list()
         self.armors = list()
+        self.weapons = list()
         self.name = name
         self.starting_health = starting_health
         self.current_health = starting_health
@@ -15,11 +18,19 @@ class Hero:
         # We use the append method to add ability objects to our list.
         self.abilities.append(ability)
 
+    def add_weapon(self, weapon):
+        '''Add weapon to self.abilities'''
+        self.weapons.append(weapon)
+
     def attack(self):
         '''Calculate the total damage from all ability attacks. return: total_damage:Int'''
         total_damage = 0
-        for ability in self.abilities:
-            total_damage += ability.attack()
+        if len(self.abilities) != 0:
+            for ability in self.abilities:
+                total_damage += ability.attack()
+        if len(self.weapons) != 0:
+            for weapon in self.weapons:
+                total_damage += weapon.attack()
         return int(total_damage)
 
     def add_armor(self, armor):
@@ -32,14 +43,11 @@ class Hero:
         if len(self.armors) != 0:
             for armor in self.armors:
                 total_block += armor.block()
-                total_block -= damage_amt
-        else:
-            total_block -= damage_amt
-        return int(total_block)
+        return int(damage_amt - total_block)
 
     def take_damage(self, damage):
         '''Updates self.current_health to reflect the damage minus the defense.'''
-        self.current_health -= (damage + self.defend(damage))
+        self.current_health -= self.defend(damage)
 
     def is_alive(self):
         '''Return True or False depending on whether the hero is alive or not.'''
@@ -50,39 +58,30 @@ class Hero:
 
     def fight(self, opponent):
         ''' Current Hero will take turns fighting the opponent hero passed in.'''
-        # TODO: Fight each hero until a victor emerges.
-        # Phases to implement:
-        # 0) check if at least one hero has abilities. If no hero has abilities, print "Draw"
-        # 1) else, start the fighting loop until a hero has won
-        # 2) the hero (self) and their opponent must attack each other and each must take damage from the other's attack
-        # 3) After each attack, check if either the hero (self) or the opponent is alive
-        # 4) if one of them has died, print "HeroName won!" replacing HeroName with the name of the hero, and end the fight loop
-        if len(hero1.abilities) == 0 and len(opponent.abilities) == 0:
+        if len(self.abilities) == 0 and len(opponent.abilities) == 0:
             return print('Draw')
         else:
-            while hero1.is_alive() == True and opponent.is_alive() == True:
-                total_damage = hero1.attack()
+            while self.is_alive() == True and opponent.is_alive() == True:
+                total_damage = self.attack()
                 opponent.take_damage(total_damage)
-                opponent.is_alive()
                 total_damage2 = opponent.attack()
-                hero1.take_damage(total_damage2)
-                hero1.is_alive()
-            if hero1.is_alive() == False:
+                self.take_damage(total_damage2)
+            if self.is_alive() == False:
                 return print(f'{opponent.name} is the winner!')
             elif opponent.is_alive() == False:
-                return print(f'{hero1.name} is the winner!')
+                return print(f'{self.name} is the winner!')
 
 if __name__ == "__main__":
     # If you run this file from the terminal
     # this block is executed.
-    hero1 = Hero("Wonder Woman")
-    hero2 = Hero("Dumbledore")
-    ability1 = Ability("Super Speed", 10)
-    ability2 = Ability("Super Eyes", 10)
-    ability3 = Ability("Wizard Wand", 80)
-    ability4 = Ability("Wizard Beard", 20)
-    hero1.add_ability(ability1)
-    hero1.add_ability(ability2)
-    hero2.add_ability(ability3)
-    hero2.add_ability(ability4)
-    hero1.fight(hero2)
+    hero1 = Hero("Athena")
+    hero2 = Hero("Batman")
+    hero3 = Hero("Supergirl")
+    team1 = Team("Best_Team")
+    team1.add_hero(hero1)
+    team1.add_hero(hero2)
+    team1.add_hero(hero3)
+    team1.view_all_heroes
+    team1.remove_hero(hero1)
+    team1.view_all_heroes
+    team1.remove_hero(hero1)
